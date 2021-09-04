@@ -24,8 +24,16 @@ def fullViginereKeygen() -> "26x26 char matrix":
         key.append(alpha)
     return key
 
+def playfairStrToKey(keysrc : str) -> "5x5 char matrix":
+    playfairKey = []
+    for i in range(5):
+        playfairKey.append([c.upper() for c in keysrc[i*5:(i+1)*5]])
+    return playfairKey
 
-
+def alphabetSanitize(text : str) -> str:
+    sanitizedText = text
+    alphabetRegex.sub("", sanitizedText)
+    return sanitizedText.replace(" ", "")
 
 
 # Standard Viginere Cipher
@@ -113,14 +121,14 @@ def extendedViginere(sourcetext : str, key : str, encrypt = True) -> str:
     key = keyExpand(key, len(sourcetext))
     for i in range(len(sourcetext)):
         if encrypt:
-            vigishift = sourcetext[i] + key[i]
+            vigishift = ord(sourcetext[i]) + ord(key[i])
             if vigishift > 0xFF:
                 vigishift -= 0xFF
         else:
-            vigishift = sourcetext[i] - key[i]
+            vigishift = ord(sourcetext[i]) - ord(key[i])
             if vigishift < 0:
                 vigishift += 0xFF
-        resulttext.append(vigishift)
+        resulttext.append(str(vigishift) + " ")
 
     return resulttext
 
@@ -217,7 +225,7 @@ z26Inverse = [
 # Affine cipher
 # key[0] is m, not m inverse
 def affineCipher(sourcetext : str, key : (int, int), encrypt = True) -> str:
-    assert key[0] != 13 or key[0] & 1 != 0
+    assert key[0] != 13 and key[0] % 2 == 1 and 0 < key[0] < 26
     sourcetext = sourcetext.upper().replace(" ", "")
 
     resulttext = ""
@@ -241,6 +249,8 @@ def affineCipher(sourcetext : str, key : (int, int), encrypt = True) -> str:
 #     ["M", "O", "Q", "R", "T"],
 #     ["V", "W", "X", "Y", "Z"]
 #     ]
-#
+# ALNGESHPUBCDFIKMOQRTVWXYZ
+
+
 # print(playfair("temui ibu nanti malam", sampleMtxPlyf))
 # print(playfair("ZBRSFYKUPGLGRKVSNLQV", sampleMtxPlyf, False))
