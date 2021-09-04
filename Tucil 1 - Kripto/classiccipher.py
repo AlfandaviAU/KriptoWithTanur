@@ -143,7 +143,7 @@ def extendedViginere(sourcetext : str, key : str, encrypt = True) -> str:
 
 
 # Playfair Cipher
-def playfair(sourcetext : str, key : "5x5 int matrix", encrypt = True, useSpaceSeparator = False) -> str:
+def playfair(sourcetext : str, key : "5x5 char matrix", encrypt = True, useSpaceSeparator = False) -> str:
     sourcetext = sourcetext.upper().replace("J", "I").replace(" ", "")
     alphabetRegex.sub("", sourcetext)
 

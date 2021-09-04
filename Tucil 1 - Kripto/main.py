@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from PIL import ImageTk, Image
 import classiccipher
+import Other.basicOps
 
 import ctypes
 import pathlib
@@ -149,11 +150,11 @@ class Mainscreen(tk.Frame):
             elif cipherType == "extended viginere" and plaintextsrc == "textbox":
                 ciphertext = classiccipher.extendedViginere(plaintext, key)
             elif cipherType == "playfair":
-                if len(key) != 25:
-                    self.output_box.insert(tk.END, "Invalid playfair key")
-                else:
-                    playfairMatrix = classiccipher.strToKeyMatrix(key, 5)
-                    ciphertext     = classiccipher.playfair(plaintext, playfairMatrix)
+                alphabetMatrix = Other.basicOps.generateKeySquare(key.upper().replace(" ", ""), "j")
+                for i in range(5):
+                    for j in range(5):
+                        alphabetMatrix[i][j] = alphabetMatrix[i][j].upper()
+                ciphertext     = classiccipher.playfair(plaintext, alphabetMatrix)
             elif cipherType == "affine":
                 affineParam = key.split(" ")
                 affineM = int(affineParam[0].rstrip())
@@ -209,11 +210,11 @@ class Mainscreen(tk.Frame):
             elif cipherType == "extended viginere" and ciphertextsrc == "textbox":
                 plaintext = classiccipher.extendedViginere(ciphertext, key, False)
             elif cipherType == "playfair":
-                if len(key) != 25:
-                    self.output_box.insert(tk.END, "Invalid playfair key")
-                else:
-                    playfairMatrix = classiccipher.strToKeyMatrix(key, 5)
-                    plaintext      = classiccipher.playfair(ciphertext, playfairMatrix, False)
+                alphabetMatrix = Other.basicOps.generateKeySquare(key.upper().replace(" ", ""), "j")
+                for i in range(5):
+                    for j in range(5):
+                        alphabetMatrix[i][j] = alphabetMatrix[i][j].upper()
+                plaintext      = classiccipher.playfair(ciphertext, alphabetMatrix, False)
             elif cipherType == "affine":
                 affineParam = key.split(" ")
                 affineM = int(affineParam[0].rstrip())
