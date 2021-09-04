@@ -17,6 +17,12 @@ class Mainscreen(tk.Frame):
         tk.Frame.__init__(self, master)
         self.grid()
 
+        # self.master.geometry("540x440")
+        # for i in range(30):
+        #     self.master.rowconfigure(i, weight=1)
+        #     self.master.columnconfigure(i, weight=1)
+        # self.master.columnconfigure(0, weight=1000) # Digunakan untuk whitespace
+
         self.create_input_box()
         self.create_output_box()
         self.create_key_box()
@@ -25,13 +31,7 @@ class Mainscreen(tk.Frame):
         self.create_cipher_option()
         self.create_view_option()
         self.create_source_option()
-
-        self.master.geometry("540x440")
-        for i in range(30):
-            self.master.rowconfigure(i, weight=1)
-            self.master.columnconfigure(i, weight=1)
-        self.master.columnconfigure(0, weight=1000) # Digunakan untuk whitespace
-
+        self.create_label()
 
 
 
@@ -47,7 +47,7 @@ class Mainscreen(tk.Frame):
         self.viewSelect = tk.StringVar(self.master)
         self.viewSelect.set(viewOption[0])
         self.viewOption = tk.OptionMenu(self.master, self.viewSelect, *viewOption)
-        self.viewOption.grid(row=3, column=5)
+        self.viewOption.grid(row=1, column=0)
 
     def create_source_option(self):
         srcOption = [
@@ -58,7 +58,7 @@ class Mainscreen(tk.Frame):
         self.srcSelect = tk.StringVar(self.master)
         self.srcSelect.set(srcOption[0])
         self.srcOption = tk.OptionMenu(self.master, self.srcSelect, *srcOption)
-        self.srcOption.grid(row=2, column=5)
+        self.srcOption.grid(row=3, column=0)
 
     def create_cipher_option(self):
         cipherOption = [
@@ -74,34 +74,39 @@ class Mainscreen(tk.Frame):
         self.cipherSelect = tk.StringVar(self.master)
         self.cipherSelect.set(cipherOption[0])
         self.cipherOption = tk.OptionMenu(self.master, self.cipherSelect, *cipherOption)
-        self.cipherOption.grid(row=5, column=5)
+        self.cipherOption.grid(row=5, column=0)
 
     def create_crypt_button(self):
         self.encrypt_button = tk.Button(self, text="Encrypt", command=self.encrypt_callback)
-        self.encrypt_button.grid(row=30, column=15)
+        self.encrypt_button.grid(row=0, column=0)
         self.decrypt_button = tk.Button(self, text="Decrypt", command=self.decrypt_callback)
-        self.decrypt_button.grid(row=20, column=15)
+        self.decrypt_button.grid(row=4, column=0)
 
     def create_file_select_button(self):
         self.file_button = tk.Button(self, text="Choose file", command=self.fileselect_callback)
-        self.file_button.grid(row=50, column=15)
+        self.file_button.grid(row=2, column=0)
         self.file_string = tk.StringVar(self.master)
         self.file_label  = tk.Label(self, textvariable=self.file_string)
-        self.file_label.grid(row=50, column=16)
+        self.file_label.grid(row=2, column=1)
         self.targetfilename = None
 
     def create_output_box(self):
         self.output_box = tk.Text(self.master, height=5, width=10)
-        self.output_box.grid(row=40, column=10)
+        self.output_box.grid(row=6, column=4)
+        self.output_box.insert(tk.END, "Output")
         self.output_box.config(state=tk.DISABLED)
 
     def create_input_box(self):
         self.input_box = tk.Text(self.master, height=5, width=10)
-        self.input_box.grid(row=40, column=5)
+        self.input_box.grid(row=6, column=0)
 
     def create_key_box(self):
         self.key_box = tk.Text(self.master, height=5, width=10)
-        self.key_box.grid(row=40, column=15)
+        self.key_box.grid(row=6, column=2)
+
+    def create_label(self):
+        self.input_box.insert(tk.END, "Input")
+        self.key_box.insert(tk.END, "Key")
 
 
     def fileselect_callback(self):
@@ -164,6 +169,8 @@ class Mainscreen(tk.Frame):
                     hillMatrix     = classiccipher.strToKeyMatrix(key, 3)
                     ciphertext     = classiccipher.hillCipher(plaintext, hillMatrix)
 
+            if self.viewSelect.get() == "5-char group":
+                ciphertext = padSpacingPerN(ciphertext, 5)
 
             self.output_box.insert(tk.END, ciphertext)
         self.output_box.config(state=tk.DISABLED)
@@ -189,6 +196,8 @@ class Mainscreen(tk.Frame):
             else:
                 ciphertext = getPlaintextFromFile(self.targetfilename)
 
+            if cipherType != "extendedViginere":
+                ciphertext = classiccipher.alphabetSanitize(ciphertext)
 
             plaintext = ""
             if cipherType == "viginere":
@@ -220,6 +229,8 @@ class Mainscreen(tk.Frame):
                     hillMatrix     = classiccipher.strToKeyMatrix(key, 3)
                     plaintext      = classiccipher.hillCipher(ciphertext, hillMatrix, False)
 
+            if self.viewSelect.get() == "5-char group":
+                plaintext = padSpacingPerN(plaintext, 5)
             self.output_box.insert(tk.END, plaintext)
         self.output_box.config(state=tk.DISABLED)
 
@@ -238,6 +249,14 @@ def getPlaintextFromFile(abspathsrc : str) -> str:
     with open(abspathsrc, "r") as file:
         plaintext = file.read()
     return plaintext
+
+def padSpacingPerN(src : str, n : int) -> str:
+    paddedStr = ""
+    for i in range(len(src)):
+        paddedStr += src[i]
+        if i % n == n - 1:
+            paddedStr += " "
+    return paddedStr
 
 
 def extendedViginereBinaryBinding(absolutePathSrc, key, isEncrypt):
