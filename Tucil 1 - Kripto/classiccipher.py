@@ -24,11 +24,11 @@ def fullViginereKeygen() -> "26x26 char matrix":
         key.append(alpha)
     return key
 
-def playfairStrToKey(keysrc : str) -> "5x5 char matrix":
-    playfairKey = []
-    for i in range(5):
-        playfairKey.append([c.upper() for c in keysrc[i*5:(i+1)*5]])
-    return playfairKey
+def strToKeyMatrix(keysrc : str, n : int) -> "nxn char matrix":
+    keyMatrix = []
+    for i in range(n):
+        keyMatrix.append([c.upper() for c in keysrc[i*n:(i+1)*n]])
+    return keyMatrix
 
 def alphabetSanitize(text : str) -> str:
     sanitizedText = text
@@ -239,7 +239,68 @@ def affineCipher(sourcetext : str, key : (int, int), encrypt = True) -> str:
 
     return resulttext
 
+def matrix3Inv(mtx : "3x3 int matrix") -> "3x3 int matrix":
+    A = mtx[1][1] * mtx[2][2] - mtx[2][1] * mtx[1][2]
+    B = -(mtx[1][0] * mtx[2][2] - mtx[1][2] * mtx[2][0])
+    C = mtx[1][0] * mtx[2][1] - mtx[1][1] * mtx[2][0]
+    D = -(mtx[0][1] * mtx[2][2] - mtx[2][1] * mtx[0][2])
+    E = mtx[0][0] * mtx[2][2] - mtx[0][2] * mtx[2][0]
+    F = -(mtx[0][0] * mtx[2][1] - mtx[0][1] * mtx[2][0])
+    G = mtx[0][1] * mtx[1][2] - mtx[1][1] * mtx[0][2]
+    H = -(mtx[0][0] * mtx[1][2] - mtx[0][2] * mtx[1][0])
+    I = mtx[0][0] * mtx[1][1] - mtx[0][1] * mtx[1][0]
+    det       = (A*mtx[0][0] + B*mtx[0][1] + C*mtx[0][2]) % 26
+    detrepM26 = z26Inverse[det-1]
 
+    inv = [
+        [A, D, G],
+        [B, E, H],
+        [C, F, I],
+        ]
+
+    for i in range(3):
+        for j in range(3):
+            inv[i][j] = (inv[i][j] * detrepM26) % 26
+
+    return inv
+
+# Hill cipher with m = 3
+def hillCipher(sourcetext : str, key : "3x3 char matrix", encrypt = True) -> str:
+    sourcetext = sourcetext.upper().replace(" ", "").rstrip()
+
+    for i in range(3):
+        for j in range(3):
+            key[i][j] = ord(key[i][j].upper()) - 0x41
+
+    while len(sourcetext) % 3 != 0:
+        sourcetext += "X"
+
+    resulttext = ""
+    if encrypt:
+        segment = ""
+        for i in range(len(sourcetext)):
+            segment += sourcetext[i]
+            if i % 3 == 2:
+                plainsegment = [ord(c) - 0x41 for c in segment]
+                for i in range(3):
+                    linearMult = plainsegment[0]*key[i][0] + plainsegment[1]*key[i][1] + plainsegment[2]*key[i][2]
+                    linearMult = linearMult % 26
+                    resulttext += chr(linearMult + 0x41)
+                segment = ""
+    else:
+        key = matrix3Inv(key)
+        segment = ""
+        for i in range(len(sourcetext)):
+            segment += sourcetext[i]
+            if i % 3 == 2:
+                ciphersegment = [ord(c) - 0x41 for c in segment]
+                for i in range(3):
+                    linearMult = ciphersegment[0]*key[i][0] + ciphersegment[1]*key[i][1] + ciphersegment[2]*key[i][2]
+                    linearMult = linearMult % 26
+                    resulttext += chr(linearMult + 0x41)
+                segment = ""
+
+    return resulttext
 
 # Playfair testing
 # sampleMtxPlyf = [

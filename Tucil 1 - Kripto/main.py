@@ -67,7 +67,8 @@ class Mainscreen(tk.Frame):
             "autokey viginere",
             "extended viginere",
             "playfair",
-            "affine"
+            "affine",
+            "hill"
             ]
 
         self.cipherSelect = tk.StringVar(self.master)
@@ -105,7 +106,6 @@ class Mainscreen(tk.Frame):
 
     def fileselect_callback(self):
         sourcefilename = askopenfilename()
-        print(sourcefilename) # DEBUG
         filename = sourcefilename[sourcefilename.rfind("/") + 1:len(sourcefilename)]
         self.file_string.set(filename)
         self.targetfilename = sourcefilename
@@ -147,7 +147,7 @@ class Mainscreen(tk.Frame):
                 if len(key) != 25:
                     self.output_box.insert(tk.END, "Invalid playfair key")
                 else:
-                    playfairMatrix = classiccipher.playfairStrToKey(key)
+                    playfairMatrix = classiccipher.strToKeyMatrix(key, 5)
                     ciphertext     = classiccipher.playfair(plaintext, playfairMatrix)
             elif cipherType == "affine":
                 affineParam = key.split(" ")
@@ -157,6 +157,12 @@ class Mainscreen(tk.Frame):
                     ciphertext = classiccipher.affineCipher(plaintext, (affineM, affineB))
                 except AssertionError:
                     self.output_box.insert(tk.END, "Invalid affine key")
+            elif cipherType == "hill":
+                if len(key) != 9:
+                    self.output_box.insert(tk.END, "Invalid hill m=3 key")
+                else:
+                    hillMatrix     = classiccipher.strToKeyMatrix(key, 3)
+                    ciphertext     = classiccipher.hillCipher(plaintext, hillMatrix)
 
 
             self.output_box.insert(tk.END, ciphertext)
@@ -197,7 +203,7 @@ class Mainscreen(tk.Frame):
                 if len(key) != 25:
                     self.output_box.insert(tk.END, "Invalid playfair key")
                 else:
-                    playfairMatrix = classiccipher.playfairStrToKey(key)
+                    playfairMatrix = classiccipher.strToKeyMatrix(key, 5)
                     plaintext      = classiccipher.playfair(ciphertext, playfairMatrix, False)
             elif cipherType == "affine":
                 affineParam = key.split(" ")
@@ -207,6 +213,12 @@ class Mainscreen(tk.Frame):
                     plaintext = classiccipher.affineCipher(ciphertext, (affineM, affineB), False)
                 except AssertionError:
                     self.output_box.insert(tk.END, "Invalid affine key")
+            elif cipherType == "hill":
+                if len(key) != 9:
+                    self.output_box.insert(tk.END, "Invalid hill key")
+                else:
+                    hillMatrix     = classiccipher.strToKeyMatrix(key, 3)
+                    plaintext      = classiccipher.hillCipher(ciphertext, hillMatrix, False)
 
             self.output_box.insert(tk.END, plaintext)
         self.output_box.config(state=tk.DISABLED)
