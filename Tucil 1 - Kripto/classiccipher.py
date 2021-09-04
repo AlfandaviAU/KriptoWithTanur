@@ -1,6 +1,6 @@
 import re
 import random
-from fullviginerekey import fullViginereKeyMatrix
+# from fullviginerekey import fullViginereKeyMatrix
 alphabetRegex = re.compile("[^a-zA-Z]")
 
 

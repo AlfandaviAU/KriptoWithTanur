@@ -31,8 +31,8 @@ def decryptVigenere(text,key):
         arr_hasil.append(res_char)
     return convertArrToPlain(arr_hasil)
 
-# print(encryptVigenere(plaintext,input_key))
-# print(decryptVigenere(encryptVigenere(plaintext,input_key),input_key))
+print(encryptVigenere(plaintext,input_key))
+print(decryptVigenere(encryptVigenere(plaintext,input_key),input_key))
 
 
 # print(convertPlainToArr(plaintext))
