@@ -67,5 +67,5 @@ def decryptSuperEncriptions(text,key):
     # print(arr_hasil)
     return decryptVigenere(convertArrToPlain(arr_hasil),key)
 
-# print(encryptSuperEncryption(plaintext,input_key))
-# print(decryptSuperEncriptions(encryptSuperEncryption(plaintext,input_key),input_key))
+print(encryptSuperEncryption(plaintext,input_key))
+print(decryptSuperEncriptions(encryptSuperEncryption(plaintext,input_key),input_key))
